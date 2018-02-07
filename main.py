@@ -3,6 +3,7 @@ import re
 import time
 import datetime
 import random
+import json
 from getpass import getpass
 from mastodon import Mastodon, StreamListener
 from data import MEDIA, MSGS, REWARDS
@@ -24,7 +25,26 @@ class Delibird(StreamListener):
     self.last_owned = datetime.datetime.now()
     self.like_count = 0
     self.visited_users = set()
+    self.reward_level = -1
     print('Delibird started!')
+    self.load()
+
+  def save(self):
+    state = {'like_count': self.like_count,
+             'visited_users': list(self.visited_users),
+             'reward_level': -1}
+    with open('state.json', 'w') as file:
+      json.dump(state, file)
+
+  def load(self):
+    try:
+      with open('state.json', 'r') as file:
+        state = json.load(file)
+      self.like_count = state['like_count']
+      self.visited_users = set(state['visited_users'])
+      self.reward_level = state['reward_level']
+    except FileNotFoundError:
+      pass
 
   def upload_media(self, name):
     media = self.mastodon.media_post(MEDIA[name]['file'], description='Source: %s' % MEDIA[name]['source'])
@@ -61,6 +81,7 @@ class Delibird(StreamListener):
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
     self.visited_users.add(self.owner.id)
+    self.save()
 
   def go_idle(self):
     self.state = STATE_IDLE
@@ -77,6 +98,7 @@ class Delibird(StreamListener):
       self.handle_mention(notification.status)
     if notification.type == 'favourite' and notification.status.visibility == 'direct':
       self.like_count += 1
+      self.save()
 
 
 def register(args):
