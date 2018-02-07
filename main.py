@@ -46,6 +46,16 @@ class Delibird(StreamListener):
     except FileNotFoundError:
       pass
 
+  def handle_rewards(self):
+    level = -1
+    for i, reward in enumerate(REWARDS):
+      if self.like_count >= reward['required_likes'] and len(self.visited_users) >= reward['required_users']:
+        level = i
+    if level > self.reward_level:
+      self.reward_level = level
+      self.send_toot(REWARDS[level]['msg_id'], nb_likes=self.like_count, nb_users=len(self.visited_users))
+      self.save()
+
   def upload_media(self, name):
     media = self.mastodon.media_post(MEDIA[name]['file'], description='Source: %s' % MEDIA[name]['source'])
     print('Uploaded %s!' % name)
@@ -90,6 +100,8 @@ class Delibird(StreamListener):
   def handle_heartbeat(self):
     if self.state == STATE_DELIVERY and self.target is not None and random.random() > 0.85:
       self.deliver()
+    elif self.state == STATE_DELIVERY:
+      self.handle_rewards()
     elif self.state == STATE_OWNED and datetime.datetime.now() - self.last_owned > MAX_OWNED:
       self.go_idle()
 
