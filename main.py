@@ -28,6 +28,7 @@ class Delibird(StreamListener):
     self.like_count = 0
     self.visited_users = set()
     self.reward_level = -1
+    self.last_idle_toot = None
     print('Delibird started!')
     self.load()
 
@@ -72,7 +73,10 @@ class Delibird(StreamListener):
     print('Sending a toot… id: %s' % msg_id)
     msg = MSGS[msg_id]
     media = [self.upload_media(name) for name in msg['media']] if 'media' in msg else None
-    self.mastodon.status_post(msg['text'].format(**kwargs), media_ids=media, in_reply_to_id=in_reply_to_id, visibility=msg.get('privacy', ''))
+    return self.mastodon.status_post(msg['text'].format(**kwargs),
+                                     media_ids=media,
+                                     in_reply_to_id=in_reply_to_id,
+                                     visibility=msg.get('privacy', ''))
 
 
   def handle_mention(self, status):
@@ -125,6 +129,10 @@ class Delibird(StreamListener):
     self.target = matches[0]
     self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
+    if self.last_idle_toot is not None:
+      self.mastodon.status_delete(self.last_idle_toot)
+      self.last_idle_toot = None
+
 
   def deliver(self):
     self.send_toot('DELIVERED', sender_acct=self.owner.acct, receiver_acct=self.target.acct)
@@ -137,7 +145,7 @@ class Delibird(StreamListener):
 
   def go_idle(self):
     self.state = STATE_IDLE
-    self.send_toot('IDLE')
+    self.last_idle_toot = self.send_toot('IDLE')
 
 
   def handle_heartbeat(self):
