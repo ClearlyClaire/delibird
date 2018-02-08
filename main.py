@@ -10,7 +10,7 @@ from data import MEDIA, MSGS, REWARDS
 
 API_BASE = 'https://social.sitedethib.com'
 
-COMMAND_RE = re.compile(r'(va voir|go see)\s*(.+)')
+COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rend visite à|go see|go visit|fly to)\s*(.+)')
 LINK_RE    = re.compile(r'<a href="([^"]+)"')
 MENTION_RE = re.compile(r'([A-Za-z0-9]+)(@[a-z0-9\.\-]+[A-Za-z0-9]+)?')
 
