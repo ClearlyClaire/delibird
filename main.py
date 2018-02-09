@@ -128,7 +128,6 @@ class Delibird(StreamListener):
     self.owner = status.account
     self.last_owned = datetime.datetime.now()
     self.target = matches[0]
-    self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
     if self.last_idle_toot is not None:
       try:
@@ -136,6 +135,8 @@ class Delibird(StreamListener):
       except mastodon.Mastodon.MastodonAPIError:
         pass
       self.last_idle_toot = None
+
+    self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
 
   def deliver(self):
