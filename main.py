@@ -135,7 +135,10 @@ class Delibird(StreamListener):
 
 
   def deliver(self):
-    self.send_toot('DELIVERED', sender_acct=self.owner.acct, receiver_acct=self.target.acct)
+    self.send_toot('DELIVERED',
+                   sender_acct=self.owner.acct,
+                   receiver_acct=self.target.acct,
+                   nb_hours=(MAX_OWNED.seconds // 3600))
     self.owner = self.target
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
