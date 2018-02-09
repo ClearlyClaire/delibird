@@ -93,6 +93,8 @@ class Delibird(StreamListener):
     self.owner = None
     self.target = None
     self.last_owned = datetime.datetime.now()
+    self.like_count = 0
+    self.visited_users = set()
     print('Delibird started!')
 
   def upload_media(self, name):
@@ -129,6 +131,7 @@ class Delibird(StreamListener):
     self.owner = self.target
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
+    self.visited_users.add(self.owner.id)
 
   def go_idle(self):
     self.state = STATE_IDLE
@@ -143,6 +146,8 @@ class Delibird(StreamListener):
   def on_notification(self, notification):
     if notification.type == 'mention':
       self.handle_mention(notification.status)
+    if notification.type == 'favourite' and notification.status.visibility == 'direct':
+      self.like_count += 1
 
 
 def register(args):
