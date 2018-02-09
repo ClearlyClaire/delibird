@@ -37,7 +37,7 @@ class Delibird(StreamListener):
   def save(self):
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
-             'reward_level': -1}
+             'reward_level': self.reward_level}
     with open('state.json', 'w') as file:
       json.dump(state, file)
 
