@@ -5,6 +5,7 @@ import datetime
 import random
 from getpass import getpass
 from mastodon import Mastodon, StreamListener
+from data import MEDIA, MSGS, REWARDS
 
 API_BASE = 'https://social.sitedethib.com'
 
@@ -12,78 +13,6 @@ MENTION_RE = re.compile(r'[A-Za-z0-9]+@[a-z0-9\.\-]+[A-Za-z0-9]+')
 
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
 MAX_OWNED = datetime.timedelta(hours=8)
-
-MEDIAS = {
-  'FLYING_AWAY': {
-    'file': 'bye.mp4',
-    'source': 'https://www.youtube.com/watch?v=6Qp4wafJ8_I',
-  },
-  'FLYING_IN': {
-    'file': 'hello.mp4',
-    'source': 'https://www.youtube.com/watch?v=Gu8EudiPLZw',
-  },
-}
-
-MSGS = {
-  'ERROR_OWNED': {
-    'text': '''@{sender_acct} Pwi pwi pwi!!!
-
-[FR] (Je suis chez quelqu'un d'autre ! Je ne peux pas être envoyé comme ça !)
-
-[EN] (I'm currently visiting someone else! You can't send me around!)''',
-    'privacy': 'direct',
-   },
-  'ERROR_DELIVERY': {
-    'text': '''@{sender_acct} Pwiii pwii pwii pwiii!
-
-[FR] (Je suis en train de m'envoler pour voir quelqu'un d'autre !)
-
-[EN] (I'm flying away to someone else!)''',
-    'privacy': 'direct',
-  },
-  'ERROR_INVALID_FORMAT': {
-    'text': '''@{sender_acct} Pwii? Pwiii!
-
-[FR] (Je n'ai pas compris qui vers qui je dois m'envoler ? Il me faut son adresse complète sans le @ initial !)
-
-[EN] (I don't understand who I'm supposed to be flying to? Type their full handle without the leading @ sign!)''',
-    'privacy': 'direct',
-  },
-  'ERROR_UNKNOWN_ACCOUNT': {
-    'text': '''@{sender_acct} Pwiii! Pwiii?
-
-[FR] (Je n'ai pas trouvé {acct} ! Vers qui d'autre dois-je aller ?)
-
-[EN] (I can't find {acct}! Who else should I visit?)''',
-    'privacy': 'direct',
-  },
-  'DELIVERY_START': {
-    'text': '''@{sender_acct} Pwiipwii pwiipwiii!
-
-[FR] (En route vers chez {acct} ! Ça peut me prendre un peu de temps !)
-
-[EN] (On my way to {acct}! This may take me a while!)''',
-    'privacy': 'direct',
-    'media': ['FLYING_AWAY'],
-  },
-  'DELIVERED': {
-    'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
-
-[FR] (Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me donnant son adresse complète sans le @ initial !)
-
-[EN] (Hello from {sender_acct}! You can send me to anyone you'd like by telling me their full handle without the leading @ sign!)''',
-    'privacy': 'direct',
-    'media': ['FLYING_IN'],
-  },
-  'IDLE': {
-    'text': ''':caique: Pwiii… pwii pwii! :caique:
-
-[FR] (Personne ne m'a envoyé me promener depuis un moment… du coup, n'importe qui peut le faire en me donnant l'adresse complète de quelqu'un, sans le @ initial !)
-
-[EN] (Noone sent me flying away… but now, anybody can! Give me someone's full handle without the leading @ sign, and I'll fly to them!)''',
-    'privacy': 'public',
-  }
-}
 
 class Delibird(StreamListener):
   def __init__(self, mastodon):
@@ -98,7 +27,7 @@ class Delibird(StreamListener):
     print('Delibird started!')
 
   def upload_media(self, name):
-    media = self.mastodon.media_post(MEDIAS[name]['file'], description='Source: %s' % MEDIAS[name]['source'])
+    media = self.mastodon.media_post(MEDIA[name]['file'], description='Source: %s' % MEDIA[name]['source'])
     print('Uploaded %s!' % name)
     return media
 
