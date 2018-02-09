@@ -15,7 +15,7 @@ LINK_RE    = re.compile(r'<a href="([^"]+)"')
 MENTION_RE = re.compile(r'([a-z0-9]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
 
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
-MAX_OWNED = datetime.timedelta(hours=8)
+MAX_OWNED = datetime.timedelta(hours=3)
 
 class Delibird(StreamListener):
   def __init__(self, mastodon):
