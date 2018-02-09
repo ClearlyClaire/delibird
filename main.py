@@ -31,6 +31,7 @@ class Delibird(StreamListener):
     self.last_idle_toot = None
     print('Delibird started!')
     self.load()
+    self.go_idle()
 
 
   def save(self):
