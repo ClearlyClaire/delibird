@@ -29,15 +29,28 @@ class Delibird(StreamListener):
     self.visited_users = set()
     self.reward_level = -1
     self.last_idle_toot = None
+    self.last_read_notification = None
     print('Delibird started!')
     self.load()
+    self.resume()
+
+
+  def resume(self):
     self.go_idle()
+
+    # Process all missed notifications
+    last_notification = self.last_read_notification
+    if last_notification is not None:
+      for notification in reversed(self.mastodon.notifications(since_id=last_notification)):
+        self.on_notification(notification)
 
 
   def save(self):
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
              'reward_level': self.reward_level}
+    if self.last_read_notification is not None:
+      state['last_read_notification'] = self.last_read_notification
     with open('state.json', 'w') as file:
       json.dump(state, file)
 
@@ -49,6 +62,7 @@ class Delibird(StreamListener):
       self.like_count = state['like_count']
       self.visited_users = set(state['visited_users'])
       self.reward_level = state['reward_level']
+      self.last_read_notification = state.get('last_read_notification', None)
     except FileNotFoundError:
       pass
 
