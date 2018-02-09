@@ -197,6 +197,7 @@ class Delibird(StreamListener):
 
 
   def on_notification(self, notification):
+    self.last_read_notification = notification.id
     if notification.type == 'mention':
       self.handle_mention(notification.status)
     if notification.type == 'favourite' and notification.status.visibility == 'direct':
