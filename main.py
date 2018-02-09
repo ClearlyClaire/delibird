@@ -36,8 +36,6 @@ class Delibird(StreamListener):
 
 
   def resume(self):
-    self.go_idle()
-
     # Process all missed notifications
     last_notification = self.last_read_notification
     if last_notification is not None:
@@ -48,9 +46,16 @@ class Delibird(StreamListener):
   def save(self):
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
-             'reward_level': self.reward_level}
+             'reward_level': self.reward_level,
+             'state': self.state}
     if self.last_read_notification is not None:
       state['last_read_notification'] = self.last_read_notification
+    if self.last_idle_toot is not None:
+      state['last_idle_toot'] = self.last_idle_toot.id
+    if self.owner is not None:
+      state['owner'] = self.owner.id
+    if self.target is not None:
+      state['target'] = self.target.id
     with open('state.json', 'w') as file:
       json.dump(state, file)
 
@@ -62,7 +67,14 @@ class Delibird(StreamListener):
       self.like_count = state['like_count']
       self.visited_users = set(state['visited_users'])
       self.reward_level = state['reward_level']
+      self.state = state.get('state', STATE_IDLE)
       self.last_read_notification = state.get('last_read_notification', None)
+      last_idle_toot = state.get('last_idle_toot', None)
+      owner = state.get('owner', None)
+      target = state.get('target', None)
+      self.last_idle_toot = None if last_idle_toot is None else self.mastodon.status(last_idle_toot)
+      self.owner = None if owner is None else self.mastodon.account(owner)
+      self.target = None if target is None else self.mastodon.account(target)
     except FileNotFoundError:
       pass
 
@@ -88,6 +100,7 @@ class Delibird(StreamListener):
     print('Sending a toot… id: %s' % msg_id)
     msg = MSGS[msg_id]
     media = [self.upload_media(name) for name in msg['media']] if 'media' in msg else None
+    self.save()
     return self.mastodon.status_post(msg['text'].format(**kwargs),
                                      media_ids=media,
                                      in_reply_to_id=in_reply_to_id,
