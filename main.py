@@ -123,11 +123,15 @@ class Delibird(StreamListener):
     matches = self.mastodon.account_search(receiver_acct)
     if not matches:
       return self.send_toot('ERROR_UNKNOWN_ACCOUNT', status, sender_acct=status.account.acct, acct=receiver_acct)
+    target = matches[0]
+
+    if target.id == status.account.id:
+      return self.send_toot('ERROR_SAME_ACCOUNT', status, sender_acct=status.account.acct)
 
     self.state = STATE_DELIVERY
     self.owner = status.account
     self.last_owned = datetime.datetime.now()
-    self.target = matches[0]
+    self.target = target
 
     if self.last_idle_toot is not None:
       try:

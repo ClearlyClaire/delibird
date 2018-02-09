@@ -42,6 +42,14 @@ MSGS = {
 [EN] I can't find {acct}! Who else should I visit?''',
     'privacy': 'direct',
   },
+  'ERROR_SAME_ACCOUNT': {
+    'text': '''@{sender_acct} Pwiii!
+
+[FR] Hé, ce n'est pas du jeu de vouloir me garder comme ça ! Vers qui d'autre dois-je aller ?
+
+[EN] Hey, it's not fair to try to keep me like this! Who else should I visit?''',
+    'privacy': 'direct',
+  },
   'DELIVERY_START': {
     'text': '''@{sender_acct} Pwiipwii pwiipwiii!
 
