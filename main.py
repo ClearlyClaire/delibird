@@ -131,7 +131,10 @@ class Delibird(StreamListener):
     self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
     if self.last_idle_toot is not None:
-      self.mastodon.status_delete(self.last_idle_toot)
+      try:
+        self.mastodon.status_delete(self.last_idle_toot)
+      except mastodon.Mastodon.MastodonAPIError:
+        pass
       self.last_idle_toot = None
 
 
