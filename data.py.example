@@ -1,0 +1,86 @@
+MEDIA = {
+  'FLYING_AWAY': {
+    'file': 'bye.mp4',
+    'source': 'https://www.youtube.com/watch?v=6Qp4wafJ8_I',
+  },
+  'FLYING_IN': {
+    'file': 'hello.mp4',
+    'source': 'https://www.youtube.com/watch?v=Gu8EudiPLZw',
+  },
+}
+
+MSGS = {
+  'ERROR_OWNED': {
+    'text': '''@{sender_acct} Pwi pwi pwi!!!
+
+[FR] Je suis chez quelqu'un d'autre ! Je ne peux pas partir me promener pour l'instant !
+
+[EN] I'm currently visiting someone else! You can't send me around right now!''',
+    'privacy': 'direct',
+   },
+  'ERROR_DELIVERY': {
+    'text': '''@{sender_acct} Pwiii pwii pwii pwiii!
+
+[FR] Je suis déjà en train de m'envoler pour voir quelqu'un d'autre !
+
+[EN] I'm already flying away to someone else!''',
+    'privacy': 'direct',
+  },
+  'ERROR_INVALID_FORMAT': {
+    'text': '''@{sender_acct} Pwii? Pwiii!
+
+[FR] Je n'ai pas compris vers qui je dois m'envoler ? Il faut me dire « va voir utilisateur@domaine » !
+
+[EN] I don't understand who I'm supposed to be flying to? You have to tell me “go see user@domain”!''',
+    'privacy': 'direct',
+  },
+  'ERROR_UNKNOWN_ACCOUNT': {
+    'text': '''@{sender_acct} Pwiii! Pwiii?
+
+[FR] Je n'ai pas trouvé {acct} ! Vers qui d'autre dois-je aller ?
+
+[EN] I can't find {acct}! Who else should I visit?''',
+    'privacy': 'direct',
+  },
+  'DELIVERY_START': {
+    'text': '''@{sender_acct} Pwiipwii pwiipwiii!
+
+[FR] En route vers chez {acct} ! Ça peut me prendre un peu de temps !
+
+[EN] On my way to {acct}! This may take me a while!''',
+    'privacy': 'direct',
+    'media': ['FLYING_AWAY'],
+  },
+  'DELIVERED': {
+    'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
+
+[FR] Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me répondant « va voir utilisateur@domaine » ! Pendant {nb_hours} heures, je n'écouterai que toi !
+
+[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! I'll only listen to you for the next {nb_hours} hours!''',
+    'privacy': 'direct',
+    'media': ['FLYING_IN'],
+  },
+  'IDLE': {
+    'text': ''':caique: Pwiii… pwii pwii! :caique:
+
+[FR] Personne ne m'a envoyé me promener depuis un moment… du coup, n'importe qui peut le faire en me répondant « va voir utilisateur@domaine » !
+
+[EN] Noone sent me flying away… but now, anybody can! Reply me with “go see user@domain”, and I'll fly to them!''',
+    'privacy': 'public',
+  },
+
+  'REWARD1': {
+    'text': ''':caique: Pwiiiiii <3 :caique:
+
+[FR] J'ai rencontré {nb_users} personnes et j'ai apporté du bonheur {nb_likes} fois ! J'ai bien mérité un petit gratouilli !
+
+[EN] I've met {nb_users} people and I've made them happy {nb_likes} times! I've earned myself a belly rub!''',
+    'privacy': 'public',
+  },
+}
+
+REWARDS = [
+  {'required_likes': 2,
+   'required_users': 3,
+   'msg_id': 'REWARD1'},
+]
