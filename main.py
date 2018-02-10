@@ -188,7 +188,7 @@ class Delibird(StreamListener):
 
 
   def handle_heartbeat(self):
-    if self.state == STATE_DELIVERY and self.target is not None and random.random() >= 0.9:
+    if self.state == STATE_DELIVERY and self.target is not None and random.random() >= 0.94:
       self.deliver()
     elif self.state == STATE_DELIVERY:
       self.handle_rewards()
