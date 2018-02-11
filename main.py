@@ -12,7 +12,7 @@ API_BASE = 'https://social.sitedethib.com'
 
 COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rend visite à|go see|go visit|fly to)\s*(.+)', re.IGNORECASE)
 LINK_RE    = re.compile(r'<a href="([^"]+)"')
-MENTION_RE = re.compile(r'([a-z0-9]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
+MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
 
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
 MAX_OWNED = datetime.timedelta(hours=3)
