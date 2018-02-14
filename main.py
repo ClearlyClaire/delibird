@@ -18,6 +18,20 @@ MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
 MAX_OWNED = datetime.timedelta(hours=3)
 
+class Error(Exception):
+  pass
+
+class InternalError(Error):
+  def __init__(self, acct):
+    self.acct = acct
+
+class InvalidFormatError(Error):
+  pass
+
+class AccountNotFoundError(Error):
+  def __init__(self, acct):
+    self.acct = acct
+
 class Delibird(StreamListener):
   def __init__(self, mastodon):
     StreamListener.__init__(self)
@@ -117,6 +131,45 @@ class Delibird(StreamListener):
     return status
 
 
+  def resolve_account(self, text_with_user, status):
+    receiver_acct = None
+    # First, see if we have a handle we can resolve, without the leading '@'
+    match = MENTION_RE.match(text_with_user)
+    if match:
+      if match.group(2):
+        # If it's a full handle, use it
+        receiver_acct = match.group(0)
+      else:
+        # If it's *not* a full handle, append the user's domain
+        receiver_acct = '@'.join([match.group(1)] + status.account.acct.split('@')[1:])
+    else:
+      # Maybe it's a link to their profile, or a mention. Switch to link handling.
+      match = LINK_RE.search(text_with_user)
+      if match:
+        url = match.group(1)
+        # First check if it's one of the mentioned users
+        for user in mentions:
+          if user.url == url:
+            return user
+        try:
+          matches = self.mastodon.search(url, resolve=True).accounts
+        except:
+          raise InternalError(url)
+        if matches:
+          return matches[0]
+
+    if not receiver_acct:
+      raise InvalidFormatError
+
+    try:
+      matches = self.mastodon.account_search(receiver_acct)
+    except:
+      raise InternalError(receiver_acct)
+    if not matches:
+      raise UnknownAccountError(receiver_acct)
+    return matches[0]
+
+
   def handle_mention(self, status):
     print('Got a mention!')
     # Only reply to valid commands
@@ -134,39 +187,15 @@ class Delibird(StreamListener):
       return self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
     if self.state == STATE_OWNED and self.owner and self.owner.id != status.account.id:
       return self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct)
-    receiver_acct = None
-
-    # First, see if we have a handle we can resolve, without the leading '@'
-    match = MENTION_RE.match(text_with_user)
-    if match:
-      if match.group(2):
-        # If it's a full handle, use it
-        receiver_acct = match.group(0)
-      else:
-        # If it's *not* a full handle, append the user's domain
-        receiver_acct = '@'.join([match.group(1)] + status.account.acct.split('@')[1:])
-    else:
-      # Maybe it's a link to their profile, or a mention. Switch to link handling.
-      match = LINK_RE.search(text_with_user)
-      if match:
-        url = match.group(1)
-        try:
-          matches = self.mastodon.search(url, resolve=True).accounts
-        except:
-          return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=url)
-        if matches:
-          receiver_acct = matches[0].acct
-
-    if not receiver_acct:
-      return self.send_toot('ERROR_INVALID_FORMAT', status, sender_acct=status.account.acct)
 
     try:
-      matches = self.mastodon.account_search(receiver_acct)
-    except:
-      return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=receiver_acct)
-    if not matches:
-      return self.send_toot('ERROR_UNKNOWN_ACCOUNT', status, sender_acct=status.account.acct, acct=receiver_acct)
-    target = matches[0]
+      target = self.resolve_account(text_with_user, status)
+    except AccountNotFoundError as e:
+      return self.send_toot('ERROR_UNKNOWN_ACCOUNT', status, sender_acct=status.account.acct, acct=e.acct)
+    except InvalidFormatError:
+      return self.send_toot('ERROR_INVALID_FORMAT', status, sender_acct=status.account.acct)
+    except InternalError as e:
+      return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=e.acct)
 
     if target.id == status.account.id:
       return self.send_toot('ERROR_SAME_ACCOUNT', status, sender_acct=status.account.acct)
