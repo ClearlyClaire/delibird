@@ -4,6 +4,7 @@ import time
 import datetime
 import random
 import json
+import itertools
 from getpass import getpass
 from mastodon import Mastodon, StreamListener
 from data import MEDIA, MSGS, REWARDS
@@ -99,12 +100,21 @@ class Delibird(StreamListener):
   def send_toot(self, msg_id, in_reply_to_id=None, **kwargs):
     print('Sending a toot… id: %s' % msg_id)
     msg = MSGS[msg_id]
-    media = [self.upload_media(name) for name in msg['media']] if 'media' in msg else None
+    if 'media' in msg:
+      if isinstance(msg['media'], dict):
+        choices = list(itertools.chain.from_iterable([key] * count for key, count in msg['media'].items()))
+        media_desc = random.choice(choices)
+      else:
+        media_desc = msg['media']
+      media = [self.upload_media(name) for name in media_desc]
+    else:
+      media = None
+    status = self.mastodon.status_post(msg['text'].format(**kwargs),
+                                       media_ids=media,
+                                       in_reply_to_id=in_reply_to_id,
+                                       visibility=msg.get('privacy', ''))
     self.save()
-    return self.mastodon.status_post(msg['text'].format(**kwargs),
-                                     media_ids=media,
-                                     in_reply_to_id=in_reply_to_id,
-                                     visibility=msg.get('privacy', ''))
+    return status
 
 
   def handle_mention(self, status):
@@ -140,14 +150,20 @@ class Delibird(StreamListener):
       match = LINK_RE.search(text_with_user)
       if match:
         url = match.group(1)
-        matches = self.mastodon.search(url, resolve=True).accounts
+        try:
+          matches = self.mastodon.search(url, resolve=True).accounts
+        except:
+          return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=url)
         if matches:
           receiver_acct = matches[0].acct
 
     if not receiver_acct:
       return self.send_toot('ERROR_INVALID_FORMAT', status, sender_acct=status.account.acct)
 
-    matches = self.mastodon.account_search(receiver_acct)
+    try:
+      matches = self.mastodon.account_search(receiver_acct)
+    except:
+      return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=receiver_acct)
     if not matches:
       return self.send_toot('ERROR_UNKNOWN_ACCOUNT', status, sender_acct=status.account.acct, acct=receiver_acct)
     target = matches[0]
@@ -163,7 +179,7 @@ class Delibird(StreamListener):
     if self.last_idle_toot is not None:
       try:
         self.mastodon.status_delete(self.last_idle_toot)
-      except mastodon.Mastodon.MastodonAPIError:
+      except:
         pass
       self.last_idle_toot = None
 

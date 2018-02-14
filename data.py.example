@@ -50,6 +50,14 @@ MSGS = {
 [EN] Hey, it's not fair to try to keep me like this! Who else should I visit?''',
     'privacy': 'direct',
   },
+  'ERROR_INTERNAL': {
+    'text': '''@{sender_acct} Pwiiii…
+
+[FR] Je suis désolé, je n'arrive pas à contacter {acct}… il va falloir essayer avec quelqu'un d'autre.
+
+[EN] I'm sorry I cannot reach {acct}… who should I be flying to?''',
+    'privacy': 'direct',
+  },
   'DELIVERY_START': {
     'text': '''@{sender_acct} Pwiipwii pwiipwiii!
 
