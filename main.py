@@ -1,6 +1,5 @@
 import argparse
 import re
-import time
 import datetime
 import random
 import json
@@ -23,6 +22,7 @@ class Error(Exception):
 
 class InternalError(Error):
   def __init__(self, acct):
+    Error.__init__(self)
     self.acct = acct
 
 class InvalidFormatError(Error):
@@ -30,6 +30,7 @@ class InvalidFormatError(Error):
 
 class AccountNotFoundError(Error):
   def __init__(self, acct):
+    Error.__init__(self)
     self.acct = acct
 
 class Delibird(StreamListener):
@@ -97,16 +98,20 @@ class Delibird(StreamListener):
   def handle_rewards(self):
     level = -1
     for i, reward in enumerate(REWARDS):
-      if self.like_count >= reward['required_likes'] and len(self.visited_users) >= reward['required_users']:
+      if (self.like_count >= reward['required_likes']
+          and len(self.visited_users) >= reward['required_users']):
         level = i
     if level > self.reward_level:
       self.reward_level = level
-      self.send_toot(REWARDS[level]['msg_id'], nb_likes=self.like_count, nb_users=len(self.visited_users))
+      self.send_toot(REWARDS[level]['msg_id'],
+                     nb_likes=self.like_count, nb_users=len(self.visited_users))
       self.save()
 
 
   def upload_media(self, name):
-    media = self.mastodon.media_post(MEDIA[name]['file'], description='Source: %s' % MEDIA[name]['source'])
+    desc = MEDIA[name]
+    media = self.mastodon.media_post(desc['file'],
+                                     description='Source: %s' % desc['source'])
     print('Uploaded %s!' % name)
     return media
 
@@ -184,21 +189,31 @@ class Delibird(StreamListener):
     text_with_user = match.group(2)
 
     if self.state == STATE_DELIVERY:
-      return self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
+      self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
+      return
     if self.state == STATE_OWNED and self.owner and self.owner.id != status.account.id:
-      return self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct)
+      self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct)
+      return
 
     try:
       target = self.resolve_account(text_with_user, status)
-    except AccountNotFoundError as e:
-      return self.send_toot('ERROR_UNKNOWN_ACCOUNT', status, sender_acct=status.account.acct, acct=e.acct)
+    except AccountNotFoundError as err:
+      self.send_toot('ERROR_UNKNOWN_ACCOUNT', status,
+                     sender_acct=status.account.acct, acct=err.acct)
+      return
     except InvalidFormatError:
-      return self.send_toot('ERROR_INVALID_FORMAT', status, sender_acct=status.account.acct)
-    except InternalError as e:
-      return self.send_toot('ERROR_INTERNAL', status, sender_acct=status.account.acct, acct=e.acct)
+      self.send_toot('ERROR_INVALID_FORMAT', status,
+                     sender_acct=status.account.acct)
+      return
+    except InternalError as err:
+      self.send_toot('ERROR_INTERNAL', status,
+                     sender_acct=status.account.acct, acct=err.acct)
+      return
 
     if target.id == status.account.id:
-      return self.send_toot('ERROR_SAME_ACCOUNT', status, sender_acct=status.account.acct)
+      self.send_toot('ERROR_SAME_ACCOUNT', status,
+                     sender_acct=status.account.acct)
+      return
 
     self.state = STATE_DELIVERY
     self.owner = status.account
@@ -256,13 +271,13 @@ def register(args):
 
 
 def login(args):
-  mastodon = Mastodon(client_id = 'secrets/clientcred.secret', api_base_url=args.api_base)
+  mastodon = Mastodon(client_id='secrets/clientcred.secret', api_base_url=args.api_base)
   mastodon.log_in(args.user_mail, getpass(), to_file='secrets/usercred.secret')
 
 
 def run(args):
-  mastodon = Mastodon(client_id = 'secrets/clientcred.secret',
-                      access_token = 'secrets/usercred.secret',
+  mastodon = Mastodon(client_id='secrets/clientcred.secret',
+                      access_token='secrets/usercred.secret',
                       api_base_url=args.api_base)
   delibird = Delibird(mastodon)
   print('Starting streaming!')
@@ -274,7 +289,6 @@ parser.add_argument('command', type=str, choices=['register', 'login', 'run'])
 parser.add_argument('-a', '--api-base', type=str, default=API_BASE)
 parser.add_argument('-u', '--user-mail', type=str)
 args = parser.parse_args()
-
 
 if args.command == 'register':
   register(args)
