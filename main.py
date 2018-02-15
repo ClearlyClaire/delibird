@@ -147,32 +147,31 @@ class Delibird(StreamListener):
       else:
         # If it's *not* a full handle, append the user's domain
         receiver_acct = '@'.join([match.group(1)] + status.account.acct.split('@')[1:])
-    else:
-      # Maybe it's a link to their profile, or a mention. Switch to link handling.
-      match = LINK_RE.search(text_with_user)
-      if match:
-        url = match.group(1)
-        # First check if it's one of the mentioned users
-        for user in status.mentions:
-          if user.url == url:
-            return user
-        try:
-          matches = self.mastodon.search(url, resolve=True).accounts
-        except:
-          raise InternalError(url)
-        if matches:
-          return matches[0]
+      try:
+        matches = self.mastodon.account_search(receiver_acct)
+      except:
+        raise InternalError(receiver_acct)
+      if not matches:
+        raise AccountNotFoundError(receiver_acct)
+      return matches[0]
 
-    if not receiver_acct:
-      raise InvalidFormatError
+    # Maybe it's a link to their profile, or a mention. Switch to link handling.
+    match = LINK_RE.search(text_with_user)
+    if match:
+      url = match.group(1)
+      # First check if it's one of the mentioned users
+      for user in status.mentions:
+        if user.url == url:
+          return user
+      # If not, resolve it
+      try:
+        matches = self.mastodon.search(url, resolve=True).accounts
+      except:
+        raise InternalError(url)
+      if matches:
+        return matches[0]
 
-    try:
-      matches = self.mastodon.account_search(receiver_acct)
-    except:
-      raise InternalError(receiver_acct)
-    if not matches:
-      raise AccountNotFoundError(receiver_acct)
-    return matches[0]
+    raise InvalidFormatError
 
 
   def handle_mention(self, status):
