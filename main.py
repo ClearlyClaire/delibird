@@ -148,7 +148,7 @@ class Delibird(StreamListener):
       if match:
         url = match.group(1)
         # First check if it's one of the mentioned users
-        for user in mentions:
+        for user in status.mentions:
           if user.url == url:
             return user
         try:
