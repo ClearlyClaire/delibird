@@ -6,34 +6,44 @@ import json
 import itertools
 from getpass import getpass
 from mastodon import Mastodon, StreamListener
+from mastodon.Mastodon import MastodonAPIError
 from data import MEDIA, MSGS, REWARDS
 
 API_BASE = 'https://social.sitedethib.com'
 
 COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rend visite à|go see|go visit|fly to)\s*(.+)', re.IGNORECASE)
-LINK_RE    = re.compile(r'<a href="([^"]+)"')
 MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
+LINK_RE = re.compile(r'<a href="([^"]+)"')
 
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
 MAX_OWNED = datetime.timedelta(hours=3)
 
+
 class Error(Exception):
+  """Base error class for Delibird-generated errors"""
   pass
 
 class InternalError(Error):
+  """Generic internal server error"""
   def __init__(self, acct):
     Error.__init__(self)
     self.acct = acct
 
 class InvalidFormatError(Error):
+  """Error thrown when a command does not contain a properly-formatted
+  account"""
   pass
 
 class AccountNotFoundError(Error):
+  """Error thrown when the requested account cannot be resolved"""
   def __init__(self, acct):
     Error.__init__(self)
     self.acct = acct
 
+
 class Delibird(StreamListener):
+  """Main class for the Delibird bot."""
+
   def __init__(self, mastodon):
     StreamListener.__init__(self)
     self.mastodon = mastodon
@@ -52,6 +62,7 @@ class Delibird(StreamListener):
 
 
   def resume(self):
+    """Process missed notifications."""
     # Process all missed notifications
     last_notification = self.last_read_notification
     if last_notification is not None:
@@ -59,7 +70,8 @@ class Delibird(StreamListener):
         self.on_notification(notification)
 
 
-  def save(self):
+  def save(self, path='state.json'):
+    """Save state to a JSON file."""
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
              'reward_level': self.reward_level,
@@ -72,13 +84,15 @@ class Delibird(StreamListener):
       state['owner'] = self.owner.id
     if self.target is not None:
       state['target'] = self.target.id
-    with open('state.json', 'w') as file:
+    with open(path, 'w') as file:
       json.dump(state, file)
 
 
-  def load(self):
+  def load(self, path='state.json'):
+    """Load state from a JSON file.
+    May perform API requests to retrieve status or account information."""
     try:
-      with open('state.json', 'r') as file:
+      with open(path, 'r') as file:
         state = json.load(file)
       self.like_count = state['like_count']
       self.visited_users = set(state['visited_users'])
@@ -96,6 +110,8 @@ class Delibird(StreamListener):
 
 
   def handle_rewards(self):
+    """Check rewards conditions and post appropriate toot if conditions for a
+    new reward are met."""
     level = -1
     for i, reward in enumerate(REWARDS):
       if (self.like_count >= reward['required_likes']
@@ -109,6 +125,7 @@ class Delibird(StreamListener):
 
 
   def upload_media(self, name):
+    """Look up a media file description and upload it."""
     desc = MEDIA[name]
     media = self.mastodon.media_post(desc['file'],
                                      description='Source: %s' % desc['source'])
@@ -117,11 +134,13 @@ class Delibird(StreamListener):
 
 
   def send_toot(self, msg_id, in_reply_to_id=None, **kwargs):
+    """Look up a toot's description by message id and sends it."""
     print('Sending a toot… id: %s' % msg_id)
     msg = MSGS[msg_id]
     if 'media' in msg:
       if isinstance(msg['media'], dict):
-        choices = list(itertools.chain.from_iterable([key] * count for key, count in msg['media'].items()))
+        grouped_choices = ([key] * count for key, count in msg['media'].items())
+        choices = list(itertools.chain.from_iterable(grouped_choices))
         media_desc = random.choice(choices)
       else:
         media_desc = msg['media']
@@ -137,6 +156,8 @@ class Delibird(StreamListener):
 
 
   def resolve_account(self, text_with_user, status):
+    """Process command text to resolve an account from account name, mention
+    or profile URL"""
     receiver_acct = None
     # First, see if we have a handle we can resolve, without the leading '@'
     match = MENTION_RE.match(text_with_user)
@@ -149,7 +170,7 @@ class Delibird(StreamListener):
         receiver_acct = '@'.join([match.group(1)] + status.account.acct.split('@')[1:])
       try:
         matches = self.mastodon.account_search(receiver_acct)
-      except:
+      except MastodonAPIError:
         raise InternalError(receiver_acct)
       if not matches:
         raise AccountNotFoundError(receiver_acct)
@@ -166,7 +187,7 @@ class Delibird(StreamListener):
       # If not, resolve it
       try:
         matches = self.mastodon.search(url, resolve=True).accounts
-      except:
+      except MastodonAPIError:
         raise InternalError(url)
       if matches:
         return matches[0]
@@ -174,19 +195,8 @@ class Delibird(StreamListener):
     raise InvalidFormatError
 
 
-  def handle_mention(self, status):
-    print('Got a mention!')
-    # Only reply to valid commands
-    match = COMMAND_RE.search(status.content)
-    if not match:
-      return
-    # Do not reply if multiple people are mentionned
-    if len(status.mentions) > 2:
-      return
-
-    # Now, we will always reply with something!
-    text_with_user = match.group(2)
-
+  def handle_cmd_go_see(self, text_with_user, status):
+    """Handle the “go see” command requesting the bot to visit a given user"""
     if self.state == STATE_DELIVERY:
       self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
       return
@@ -222,14 +232,28 @@ class Delibird(StreamListener):
     if self.last_idle_toot is not None:
       try:
         self.mastodon.status_delete(self.last_idle_toot)
-      except:
+      except MastodonAPIError:
         pass
       self.last_idle_toot = None
 
     self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
 
+  def handle_mention(self, status):
+    """Handle toots mentioning Delibird, which may contain commands"""
+    print('Got a mention!')
+    # Do not reply if multiple people are mentionned
+    if len(status.mentions) > 2:
+      return
+    # Only reply to valid commands
+    match = COMMAND_RE.search(status.content)
+    if match:
+      return self.handle_cmd_go_see(match.group(2), status)
+
+
   def deliver(self):
+    """Deliver a message to the target, updating ownership and state in the
+    process"""
     self.send_toot('DELIVERED',
                    sender_acct=self.owner.acct,
                    receiver_acct=self.target.acct,
@@ -242,6 +266,7 @@ class Delibird(StreamListener):
 
 
   def go_idle(self):
+    """Turn idle and announce it with a public toot"""
     self.state = STATE_IDLE
     self.last_idle_toot = self.send_toot('IDLE')
 
@@ -266,15 +291,18 @@ class Delibird(StreamListener):
 
 
 def register(args):
+  """Register app on the server"""
   Mastodon.create_app('Delibird', api_base_url=args.api_base, to_file='secrets/clientcred.secret')
 
 
 def login(args):
+  """Log in as the given user, generating OAuth credentials"""
   mastodon = Mastodon(client_id='secrets/clientcred.secret', api_base_url=args.api_base)
   mastodon.log_in(args.user_mail, getpass(), to_file='secrets/usercred.secret')
 
 
 def run(args):
+  """Run the bot"""
   mastodon = Mastodon(client_id='secrets/clientcred.secret',
                       access_token='secrets/usercred.secret',
                       api_base_url=args.api_base)
@@ -283,15 +311,18 @@ def run(args):
   mastodon.stream_user(delibird)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('command', type=str, choices=['register', 'login', 'run'])
-parser.add_argument('-a', '--api-base', type=str, default=API_BASE)
-parser.add_argument('-u', '--user-mail', type=str)
-args = parser.parse_args()
+def main():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('command', type=str, choices=['register', 'login', 'run'])
+  parser.add_argument('-a', '--api-base', type=str, default=API_BASE)
+  parser.add_argument('-u', '--user-mail', type=str)
+  args = parser.parse_args()
 
-if args.command == 'register':
-  register(args)
-elif args.command == 'login':
-  login(args)
-elif args.command == 'run':
-  run(args)
+  if args.command == 'register':
+    register(args)
+  elif args.command == 'login':
+    login(args)
+  elif args.command == 'run':
+    run(args)
+
+main()
