@@ -166,7 +166,7 @@ class Delibird(StreamListener):
     except:
       raise InternalError(receiver_acct)
     if not matches:
-      raise UnknownAccountError(receiver_acct)
+      raise AccountNotFoundError(receiver_acct)
     return matches[0]
 
 
