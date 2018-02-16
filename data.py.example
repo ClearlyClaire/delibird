@@ -58,6 +58,14 @@ MSGS = {
 [EN] I'm sorry I cannot reach {acct}… who should I be flying to?''',
     'privacy': 'direct',
   },
+  'ERROR_OWN_ACCOUNT': {
+    'text': '''@{sender_acct} Pwii. Pwii?
+
+[FR] Je ne peux pas aller me voir moi-même ?
+
+[EN] I cannot fly to see myself?''',
+    'privacy': 'direct',
+  },
   'DELIVERY_START': {
     'text': '''@{sender_acct} Pwiipwii pwiipwiii!
 

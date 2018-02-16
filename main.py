@@ -224,6 +224,11 @@ class Delibird(StreamListener):
                      sender_acct=status.account.acct, acct=err.acct)
       return
 
+    if target.id == self.own_acct_id:
+      self.send_toot('ERROR_OWN_ACCOUNT', status,
+                     sender_acct=status.account.acct)
+      return
+
     if target.id == status.account.id:
       self.send_toot('ERROR_SAME_ACCOUNT', status,
                      sender_acct=status.account.acct)
@@ -253,7 +258,7 @@ class Delibird(StreamListener):
     # Only reply to valid commands
     match = COMMAND_RE.search(status.content)
     if match:
-      return self.handle_cmd_go_see(match.group(2), status)
+      self.handle_cmd_go_see(match.group(2), status)
 
 
   def deliver(self):
