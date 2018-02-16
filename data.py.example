@@ -42,6 +42,14 @@ MSGS = {
 [EN] I can't find {acct}! Who else should I visit?''',
     'privacy': 'direct',
   },
+  'ERROR_UNKNOWN_ACCOUNT2': {
+    'text': '''@{sender_acct} Pwiii! Pwiii?
+
+[FR] Je n'ai pas trouvé {acct} ! Vers qui d'autre dois-je aller ? Peut-être voulais-tu dire {suggested_acct} ?
+
+[EN] I can't find {acct}! Who else should I visit? Maybe you meant {suggested_acct}?''',
+    'privacy': 'direct',
+  },
   'ERROR_SAME_ACCOUNT': {
     'text': '''@{sender_acct} Pwiii!
 

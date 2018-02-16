@@ -201,6 +201,32 @@ class Delibird(StreamListener):
     raise InvalidFormatError
 
 
+  def handle_unknown_account(self, status, acct):
+    """Handle unknown accounts, potentially suggesting other accounts."""
+    receiver_acct = acct.split('@')
+    suggested_account = None
+    if len(receiver_acct) > 1:
+      username, domain = receiver_acct
+      try:
+        matches = self.mastodon.account_search(username, limit=40)
+      except MastodonAPIError:
+        pass
+      else:
+        for match in matches:
+          if match.username != username:
+            continue
+          if domain in match.acct:
+            suggested_account = match
+            break
+    if suggested_account is None:
+      self.send_toot('ERROR_UNKNOWN_ACCOUNT', status,
+                     sender_acct=status.account.acct, acct=acct)
+    else:
+      self.send_toot('ERROR_UNKNOWN_ACCOUNT2', status,
+                     sender_acct=status.account.acct, acct=acct,
+                     suggested_acct=suggested_account.acct)
+
+
   def handle_cmd_go_see(self, text_with_user, status):
     """Handle the “go see” command requesting the bot to visit a given user"""
     if self.state == STATE_DELIVERY:
@@ -213,8 +239,7 @@ class Delibird(StreamListener):
     try:
       target = self.resolve_account(text_with_user, status)
     except AccountNotFoundError as err:
-      self.send_toot('ERROR_UNKNOWN_ACCOUNT', status,
-                     sender_acct=status.account.acct, acct=err.acct)
+      self.handle_unknown_account(status, err.acct)
       return
     except InvalidFormatError:
       self.send_toot('ERROR_INVALID_FORMAT', status,
