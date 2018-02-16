@@ -56,6 +56,7 @@ class Delibird(StreamListener):
     self.reward_level = -1
     self.last_idle_toot = None
     self.last_read_notification = None
+    self.own_acct_id = None
     print('Delibird started!')
     self.load()
     self.resume()
@@ -84,6 +85,8 @@ class Delibird(StreamListener):
       state['owner'] = self.owner.id
     if self.target is not None:
       state['target'] = self.target.id
+    if self.own_acct_id is not None:
+      state['own_acct_id'] = self.own_acct_id
     with open(path, 'w') as file:
       json.dump(state, file)
 
@@ -99,6 +102,7 @@ class Delibird(StreamListener):
       self.reward_level = state['reward_level']
       self.state = state.get('state', STATE_IDLE)
       self.last_read_notification = state.get('last_read_notification', None)
+      self.own_acct_id = state.get('own_acct_id', None)
       last_idle_toot = state.get('last_idle_toot', None)
       owner = state.get('owner', None)
       target = state.get('target', None)
@@ -151,6 +155,7 @@ class Delibird(StreamListener):
                                        media_ids=media,
                                        in_reply_to_id=in_reply_to_id,
                                        visibility=msg.get('privacy', ''))
+    self.own_acct_id = status.account.id
     self.save()
     return status
 
