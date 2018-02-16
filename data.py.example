@@ -75,6 +75,14 @@ MSGS = {
     'privacy': 'direct',
     'media': ['FLYING_AWAY'],
   },
+  'DELIVERY_CANCELLED': {
+    'text': '''@{sender_acct} Pwiii…
+
+[FR] Tu ne veux plus que j'aille voir {acct} ? D'accord… qui dois-je aller voir ?
+
+[EN] You don't want me to go visit {acct} anymore? Ok… but who should I fly to?''',
+    'privacy': 'direct',
+  },
   'DELIVERED': {
     'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
 
