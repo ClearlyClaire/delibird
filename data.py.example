@@ -14,8 +14,10 @@ MSGS = {
     'text': '''@{sender_acct} Pwi pwi pwi!!!
 
 [FR] Je suis chez quelqu'un d'autre ! Je ne peux pas partir me promener pour l'instant !
+Je serai de nouveau disponible si cette personne ne m'envoie pas me promener d'ici {hours}h{minutes:02d} !
 
-[EN] I'm currently visiting someone else! You can't send me around right now!''',
+[EN] I'm currently visiting someone else! You can't send me around right now!
+I'll be available in {hours}h{minutes:02d} if that person doesn't send me around in the meantime!''',
     'privacy': 'direct',
    },
   'ERROR_DELIVERY': {

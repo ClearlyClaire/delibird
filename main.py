@@ -233,7 +233,10 @@ class Delibird(StreamListener):
       self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
       return
     if self.state == STATE_OWNED and self.owner and self.owner.id != status.account.id:
-      self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct)
+      delta = self.last_owned + MAX_OWNED - datetime.datetime.now()
+      minutes = delta.seconds // 60
+      self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct,
+                     hours=(minutes // 60), minutes=(minutes % 60))
       return
 
     try:
