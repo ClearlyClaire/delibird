@@ -77,7 +77,8 @@ class Delibird(StreamListener):
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
              'reward_level': self.reward_level,
-             'state': self.state}
+             'state': self.state,
+             'last_owned': self.last_owned.isoformat()}
     if self.last_read_notification is not None:
       state['last_read_notification'] = self.last_read_notification
     if self.last_idle_toot is not None:
@@ -107,6 +108,9 @@ class Delibird(StreamListener):
       last_idle_toot = state.get('last_idle_toot', None)
       owner = state.get('owner', None)
       target = state.get('target', None)
+      last_owned = state.get('last_owned', None)
+      if last_owned:
+        self.last_owned = datetime.datetime.strptime(last_owned, '%Y-%m-%dT%H:%M:%S.%f')
       self.last_idle_toot = None if last_idle_toot is None else self.mastodon.status(last_idle_toot)
       self.owner = None if owner is None else self.mastodon.account(owner)
       self.target = None if target is None else self.mastodon.account(target)
