@@ -156,10 +156,16 @@ class Delibird(StreamListener):
       media = [self.upload_media(name) for name in media_desc]
     else:
       media = None
-    status = self.mastodon.status_post(msg['text'].format(**kwargs),
-                                       media_ids=media,
-                                       in_reply_to_id=in_reply_to_id,
-                                       visibility=msg.get('privacy', ''))
+    try:
+      status = self.mastodon.status_post(msg['text'].format(**kwargs),
+                                         media_ids=media,
+                                         in_reply_to_id=in_reply_to_id,
+                                         visibility=msg.get('privacy', ''))
+    except MastodonNotFoundError:
+      # Original status deleted
+      status = self.mastodon.status_post(msg['text'].format(**kwargs),
+                                         media_ids=media,
+                                         visibility=msg.get('privacy', ''))
     self.own_acct_id = status.account.id
     self.save()
     return status
