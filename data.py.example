@@ -84,8 +84,10 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
     'text': '''@{sender_acct} Pwiipwii pwiipwiii!
 
 [FR] En route vers chez {acct} ! Ça peut me prendre un peu de temps !
+Si je me suis trompé de personne, tu peux me dire de revenir en me disant « reviens » !
 
-[EN] On my way to {acct}! This may take me a while!''',
+[EN] On my way to {acct}! This may take me a while!
+If I'm not flying to the correct person, you can still tell me to “come back”!''',
     'privacy': 'direct',
     'media': ['FLYING_AWAY'],
   },
@@ -101,8 +103,10 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
     'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
 
 [FR] Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me répondant « va voir utilisateur@domaine » ! En attendant, je ne suis qu'à toi pour les {nb_hours} prochaines heures !
+Si tu ne sais pas vers qui m'envoyer, tu peux me dire « va jouer ailleurs » !
 
-[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! Until you do, I'll be yours for the next {nb_hours} hours!''',
+[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! Until you do, I'll be yours for the next {nb_hours} hours!
+If you don't know where to send me to, you can tell me to “go play somewhere else”!''',
     'privacy': 'direct',
     'media': ['FLYING_IN'],
   },
@@ -112,6 +116,14 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
 [FR] Personne ne m'a envoyé me promener depuis un moment… du coup, n'importe qui peut le faire en me répondant « va voir utilisateur@domaine » !
 
 [EN] Noone sent me flying away… but now, anybody can! Reply me with “go see user@domain”, and I'll fly to them!''',
+    'privacy': 'public',
+  },
+  'IDLE2': {
+    'text': ''':caique: Pwiii… pwii pwii! :caique:
+
+[FR] La personne chez qui j'ai été envoyé préfère que j'aille jouer ailleurs ! Du coup, envoyez-moi chez qui vous voulez en me répondant « va voir utilisateur@domaine » !
+
+[EN] The person I was sent to would like me to play somewhere else! Reply me with “go see user@domain”, and I'll fly to them!''',
     'privacy': 'public',
   },
   'BELLY_RUB': {

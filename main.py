@@ -12,6 +12,7 @@ from data import MEDIA, MSGS, REWARDS
 API_BASE = 'https://social.sitedethib.com'
 
 COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rends visite à|go see|go visit|fly to)\s*(.+)', re.IGNORECASE)
+FREE_RE = re.compile(r"(va (te promener|jouer))|rends-toi disponible|repose-toi|va-t'en|go idle|go away|((go|play) somewhere else)|take a break", re.IGNORECASE)
 CANCEL_RE = re.compile(r'reviens|arrête|annule|stop|come back|cancel', re.IGNORECASE)
 MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
 LINK_RE = re.compile(r'<a href="([^"]+)"')
@@ -237,8 +238,20 @@ class Delibird(StreamListener):
                      suggested_acct=suggested_account.acct)
 
 
-  def handle_cmd_go_see(self, text_with_user, status):
+  def handle_cmd_free(self, status, match=None):
+    """Handle the command that allows the bird to go idle prematurely"""
+    if not self.owner or self.owner.id != status.account.id:
+      return
+    if self.state != STATE_OWNED:
+      return
+    self.state = STATE_IDLE
+    self.last_idle_toot = self.send_toot('IDLE2', in_reply_to_id=status)
+    self.save()
+
+
+  def handle_cmd_go_see(self, status, match):
     """Handle the “go see” command requesting the bot to visit a given user"""
+    text_with_user = match.group(2)
     if self.state == STATE_DELIVERY:
       self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
       return
@@ -288,7 +301,7 @@ class Delibird(StreamListener):
     self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
 
-  def handle_cmd_cancel(self, status):
+  def handle_cmd_cancel(self, status, match=None):
     """Handle the “cancel” command that cancels the last ordered delivery if the
     user issuing it is the current owner and the delivery hasn't finished yet."""
     if not self.owner or self.owner.id != status.account.id:
@@ -306,16 +319,15 @@ class Delibird(StreamListener):
     # Do not reply if multiple people are mentionned
     if len(status.mentions) > 2:
       return
-    # Only reply to valid commands
-    match = COMMAND_RE.search(status.content)
-    if match:
-      self.handle_cmd_go_see(match.group(2), status)
-      return
-    # Maybe it's a cancel command
-    match = CANCEL_RE.search(status.content)
-    if match:
-      self.handle_cmd_cancel(status)
-      return
+    # Process commands, in order of priority
+    cmds = [(COMMAND_RE, self.handle_cmd_go_see),
+            (CANCEL_RE, self.handle_cmd_cancel),
+            (FREE_RE, self.handle_cmd_free)]
+    for regexp, handler in cmds:
+      match = regexp.search(status.content)
+      if match:
+        handler(status, match)
+        return
 
 
   def deliver(self):
