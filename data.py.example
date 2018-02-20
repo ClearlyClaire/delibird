@@ -7,6 +7,10 @@ MEDIA = {
     'file': 'hello.mp4',
     'source': 'https://www.youtube.com/watch?v=Gu8EudiPLZw',
   },
+  'BELLY_RUB': {
+    'file': 'rewards/belly-rub.mp4',
+    'source': 'https://www.youtube.com/watch?v=-bTaj37E79k',
+  },
 }
 
 MSGS = {
@@ -52,20 +56,20 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
 [EN] I can't find {acct}! Who else should I visit? Maybe you meant {suggested_acct}?''',
     'privacy': 'direct',
   },
-  'ERROR_SAME_ACCOUNT': {
-    'text': '''@{sender_acct} Pwiii!
-
-[FR] Hé, ce n'est pas du jeu de vouloir me garder comme ça ! Vers qui d'autre dois-je aller ?
-
-[EN] Hey, it's not fair to try to keep me like this! Who else should I visit?''',
-    'privacy': 'direct',
-  },
   'ERROR_INTERNAL': {
     'text': '''@{sender_acct} Pwiiii…
 
 [FR] Je suis désolé, je n'arrive pas à contacter {acct}… il va falloir essayer avec quelqu'un d'autre.
 
 [EN] I'm sorry I cannot reach {acct}… who should I be flying to?''',
+    'privacy': 'direct',
+  },
+  'ERROR_SAME_ACCOUNT': {
+    'text': '''@{sender_acct} Pwiii!
+
+[FR] Hé, ce n'est pas du jeu de vouloir me garder comme ça ! Vers qui d'autre dois-je aller ?
+
+[EN] Hey, it's not fair to try to keep me like this! Who else should I visit?''',
     'privacy': 'direct',
   },
   'ERROR_OWN_ACCOUNT': {
@@ -96,9 +100,9 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
   'DELIVERED': {
     'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
 
-[FR] Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me répondant « va voir utilisateur@domaine » ! Pendant {nb_hours} heures, je n'écouterai que toi !
+[FR] Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me répondant « va voir utilisateur@domaine » ! En attendant, je ne suis qu'à toi pour les {nb_hours} prochaines heures !
 
-[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! I'll only listen to you for the next {nb_hours} hours!''',
+[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! Until you do, I'll be yours for the next {nb_hours} hours!''',
     'privacy': 'direct',
     'media': ['FLYING_IN'],
   },
@@ -110,19 +114,19 @@ I'll be available in {hours}h{minutes:02d} if that person doesn't send me around
 [EN] Noone sent me flying away… but now, anybody can! Reply me with “go see user@domain”, and I'll fly to them!''',
     'privacy': 'public',
   },
-
-  'REWARD1': {
+  'BELLY_RUB': {
     'text': ''':caique: Pwiiiiii <3 :caique:
 
 [FR] J'ai rencontré {nb_users} personnes et j'ai apporté du bonheur {nb_likes} fois ! J'ai bien mérité un petit gratouilli !
 
 [EN] I've met {nb_users} people and I've made them happy {nb_likes} times! I've earned myself a belly rub!''',
     'privacy': 'public',
+    'media': ['BELLY_RUB'],
   },
 }
 
 REWARDS = [
   {'required_likes': 2,
    'required_users': 3,
-   'msg_id': 'REWARD1'},
+   'msg_id': 'BELLY_RUB'},
 ]
