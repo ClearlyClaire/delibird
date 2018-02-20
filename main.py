@@ -251,7 +251,7 @@ class Delibird(StreamListener):
       return
     if self.state != STATE_OWNED:
       return
-    self.go_idle('IDLE2', in_reply_to_id=status)
+    self.go_idle('IDLE2')
     self.save()
 
 
@@ -369,14 +369,16 @@ class Delibird(StreamListener):
     self.save()
 
 
-  def go_idle(self, msg_id='IDLE', in_reply_to_id=None):
+  def go_idle(self, msg_id='IDLE'):
     """Turn idle and announce it with a public toot"""
     self.state = STATE_IDLE
-    self.last_idle_toot = self.send_toot(msg_id, in_reply_to_id=in_reply_to_id)
+    self.last_idle_toot = self.send_toot(msg_id)
     self.save()
-    self.additional_idle_toots = [self.send_toot('NOTIFY_IDLE', acct=acct).id
+    self.additional_idle_toots = [self.send_toot('NOTIFY_IDLE', self.last_idle_toot,
+                                                 acct=acct).id
                                     for acct in self.to_be_notified]
     self.to_be_notified = set()
+    self.save()
 
 
   def handle_heartbeat(self):
