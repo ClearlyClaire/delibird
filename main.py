@@ -15,6 +15,7 @@ COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rends visite à|go se
 FREE_RE = re.compile(r"(va (te promener|jouer))|rends-toi disponible|repose-toi|va-t'en|go idle|go away|((go|play) somewhere else)|take a break", re.IGNORECASE)
 CANCEL_RE = re.compile(r'reviens|arrête|annule|stop|come back|cancel', re.IGNORECASE)
 MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
+NOTIFY_RE = re.compile(r'dis[ -]moi|notifie[ -]moi|rappelle[ -]moi|tell me|remind me|notify me', re.IGNORECASE)
 LINK_RE = re.compile(r'<a href="([^"]+)"')
 
 STATE_OWNED, STATE_IDLE, STATE_DELIVERY = range(3)
@@ -55,8 +56,10 @@ class Delibird(StreamListener):
     self.last_owned = datetime.datetime.now()
     self.like_count = 0
     self.visited_users = set()
+    self.to_be_notified = set()
     self.reward_level = -1
     self.last_idle_toot = None
+    self.additional_idle_toots = []
     self.last_read_notification = None
     self.own_acct_id = None
     print('Delibird started!')
@@ -77,9 +80,11 @@ class Delibird(StreamListener):
     """Save state to a JSON file."""
     state = {'like_count': self.like_count,
              'visited_users': list(self.visited_users),
+             'to_be_notified': list(self.to_be_notified),
              'reward_level': self.reward_level,
              'state': self.state,
-             'last_owned': self.last_owned.isoformat()}
+             'last_owned': self.last_owned.isoformat(),
+             'additional_idle_toots': self.additional_idle_toots}
     if self.last_read_notification is not None:
       state['last_read_notification'] = self.last_read_notification
     if self.last_idle_toot is not None:
@@ -102,10 +107,12 @@ class Delibird(StreamListener):
         state = json.load(file)
       self.like_count = state['like_count']
       self.visited_users = set(state['visited_users'])
+      self.to_be_notified = set(state.get('to_be_notified', []))
       self.reward_level = state['reward_level']
       self.state = state.get('state', STATE_IDLE)
       self.last_read_notification = state.get('last_read_notification', None)
       self.own_acct_id = state.get('own_acct_id', None)
+      self.additional_idle_toots = state.get('additional_idle_toots', [])
       last_idle_toot = state.get('last_idle_toot', None)
       owner = state.get('owner', None)
       target = state.get('target', None)
@@ -244,8 +251,7 @@ class Delibird(StreamListener):
       return
     if self.state != STATE_OWNED:
       return
-    self.state = STATE_IDLE
-    self.last_idle_toot = self.send_toot('IDLE2', in_reply_to_id=status)
+    self.go_idle('IDLE2', in_reply_to_id=status)
     self.save()
 
 
@@ -297,6 +303,12 @@ class Delibird(StreamListener):
       except MastodonAPIError:
         pass
       self.last_idle_toot = None
+      for toot_id in self.additional_idle_toots:
+        try:
+          self.mastodon.status_delete(toot_id)
+        except MastodonAPIError:
+          pass
+      self.additional_idle_toots = []
 
     self.send_toot('DELIVERY_START', status, sender_acct=status.account.acct, acct=self.target.acct)
 
@@ -313,6 +325,14 @@ class Delibird(StreamListener):
                    acct=self.target.acct)
 
 
+  def handle_cmd_notify(self, status, match=None):
+    """Handle request to be notified when the Birb goes idle."""
+    if self.state == STATE_IDLE:
+      return
+    self.to_be_notified.add(status.account.acct)
+    self.send_toot('NOTIFY_REQUEST', status, acct=status.account.acct)
+
+
   def handle_mention(self, status):
     """Handle toots mentioning Delibird, which may contain commands"""
     print('Got a mention!')
@@ -322,7 +342,8 @@ class Delibird(StreamListener):
     # Process commands, in order of priority
     cmds = [(COMMAND_RE, self.handle_cmd_go_see),
             (CANCEL_RE, self.handle_cmd_cancel),
-            (FREE_RE, self.handle_cmd_free)]
+            (FREE_RE, self.handle_cmd_free),
+            (NOTIFY_RE, self.handle_cmd_notify)]
     for regexp, handler in cmds:
       match = regexp.search(status.content)
       if match:
@@ -341,14 +362,18 @@ class Delibird(StreamListener):
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
     self.visited_users.add(self.owner.id)
+    self.to_be_notified.remove(self.owner.acct)
     self.save()
 
 
-  def go_idle(self):
+  def go_idle(self, msg_id='IDLE', in_reply_to_id=None):
     """Turn idle and announce it with a public toot"""
     self.state = STATE_IDLE
-    self.last_idle_toot = self.send_toot('IDLE')
+    self.last_idle_toot = self.send_toot(msg_id, in_reply_to_id=in_reply_to_id)
     self.save()
+    self.additional_idle_toots = [self.send_toot('NOTIFY_IDLE', acct=acct).id
+                                    for acct in self.to_be_notified]
+    self.to_be_notified = set()
 
 
   def handle_heartbeat(self):
