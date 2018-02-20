@@ -11,6 +11,38 @@ MEDIA = {
     'file': 'rewards/belly-rub.mp4',
     'source': 'https://www.youtube.com/watch?v=-bTaj37E79k',
   },
+  'DJBIRB': {
+    'file': 'rewards/dj.mp4',
+    'source': 'https://www.youtube.com/watch?v=1v2SN06DnPo',
+  },
+  'SHOPPING': {
+    'file': 'rewards/shopping.mp4',
+    'source': 'https://www.youtube.com/watch?v=BfhlPEkNm7o',
+  },
+  'DANCINGQUEEN': {
+    'file': 'rewards/queen.mp4',
+    'source': 'https://www.youtube.com/watch?v=9DaGgzJm6is',
+  },
+  'MICROWAVE': {
+    'file': 'rewards/microwave.mp4',
+    'source': 'https://www.youtube.com/watch?v=NVY0qNe3BUE',
+  },
+  'JUMPING': {
+    'file': 'rewards/jumping.mp4',
+    'source': 'https://www.youtube.com/watch?v=_62o7u-BYRA',
+  },
+  'RIDING': {
+    'file': 'rewards/riding.mp4',
+    'source': 'https://www.youtube.com/watch?v=dVngVDTYbOQ',
+  },
+  'RIVERDANCE': {
+    'file': 'rewards/riverdance.webm',
+    'source': 'https://www.youtube.com/watch?v=KF7gk10jgEw',
+  },
+  'PAPERTOWEL': {
+    'file': 'rewards/papertowel.mp4',
+    'source': 'https://www.youtube.com/watch?v=6_-4KArFR08',
+  },
 }
 
 MSGS = {
@@ -135,10 +167,110 @@ If you don't know where to send me to, you can tell me to “go play somewhere e
     'privacy': 'public',
     'media': ['BELLY_RUB'],
   },
+  'PAPERTOWEL': {
+    'text': ''':caique: Pwiii… pwii! :caique:
+
+[FR] Des fois, je comprends vraiment pas mon cousin à tête noire… mais bon, il a l'air de bien s'amuser !
+
+[EN] Sometimes, I really don't understand my black-headed cousin… but he seems to be having a lot of fun!''',
+    'privacy': 'public',
+    'media': ['PAPERTOWEL'],
+  },
+  'JUMPING': {
+    'text': ''':caique: Pwii? Pwiii! :caique:
+
+[FR] Mon cousin à tête noir commence à sauter sur place… sinon, j'ai rencontré {nb_users} d'entre vous et je leur ai fait plaisir {nb_likes} fois !
+
+[EN] My black-headed cousin is starting to jump in-place… by the way, I've met {nb_users} of you and I've made them happy {nb_likes} times!''',
+    'privacy': 'public',
+    'media': ['JUMPING'],
+  },
+  'DANCINGQUEEN': {
+    'text': ''':caique: Pwii~ pwiii~ pwiii~ 🎶 :caique:
+
+[FR] Je vais bientôt rencontrer tout le fediverse ! {nb_users} personnes ! Pfiou ! Sinon, j'aime bien Queen !
+
+[EN] I've met almost all of the fediverse! {nb_users} of you! Wow! Also, I like Queen!''',
+    'privacy': 'public',
+    'media': ['DANCINGQUEEN'],
+  },
+  'SHOPPING': {
+    'text': ''':caique: Pwi pwi pwiiii! :caique:
+
+[FR] J'ai rencontré pas moins de {nb_users} mastonautes ! Et ils ont aimé mes visites {nb_likes} fois ! Mon cousin est parti m'acheter à manger !
+
+[EN] I've met {nb_users} mastonauts! And they liked my visits {nb_likes} times! My cousin went shopping for dinner!''',
+    'privacy': 'public',
+    'media': ['SHOPPING'],
+  },
+  'MICROWAVE': {
+    'text': ''':caique: Pwi! Pwi! Pwi! Pwi! Pwi! Pwi! :caique:
+
+[FR] J'ai rencontré {nb_users} personnes formidables ! Ils ont aimé mes visites {nb_likes} fois ! Je vais fêter ça en dinant !
+
+[EN] I've met {nb_users} amazing people! And they liked me {nb_likes} times! I'll eat dinner to celebrate!''',
+    'privacy': 'public',
+    'media': ['MICROWAVE'],
+  },
+  'DJBIRB': {
+    'text': ''':caique: Pwiii~ pwiii~ pwiii~ pwiii~ :caique:
+
+[FR] Pwiiiii~ j'ai rencontré {nb_users} personnes qui m'ont aimé {nb_likes} fois, je m'amuse comme un petit fou !
+
+[EN] Pwiiiii~ I've met {nb_users} who liked me {nb_likes} times, I'm having a lot of fun!''',
+    'privacy': 'public',
+    'media': ['DJBIRB'],
+  },
+  'RIDING': {
+    'text': ''':caique: Pwii pwii pwii~ :caique:
+
+[FR] Il n'y a pas que mon cousin qui peut s'amuser comme ça ! Regardez-moi ! ~
+J'ai rencontré {nb_users} personnes et ils m'ont apprécié {nb_likes} fois !
+
+[EN] My cousin is not the only one that can have fun! Look at me! ~
+I've met {nb_users} people so far and they liked me {nb_likes} times!''',
+    'privacy': 'public',
+    'media': ['RIDING'],
+  },
+  'RIVERDANCE': {
+    'text': ''':caique: Pwii 🎶 :caique:
+
+[FR] Regardez mon cousin danser !
+J'ai rencontré {nb_users} personnes et ils m'ont apprécié {nb_likes} fois !
+
+[EN] Watch my cousin dance!
+I've met {nb_users} people so far and they liked me {nb_likes} times!''',
+    'privacy': 'public',
+    'media': ['RIVERDANCE'],
+  },
 }
 
 REWARDS = [
   {'required_likes': 2,
    'required_users': 3,
    'msg_id': 'BELLY_RUB'},
+  {'required_likes': 5,
+   'required_users': 5,
+   'msg_id': 'JUMPING'},
+  {'required_likes': 10,
+   'required_users': 10,
+   'msg_id': 'DANCINGQUEEN'},
+  {'required_likes': 20,
+   'required_users': 12,
+   'msg_id': 'SHOPPING'},
+  {'required_likes': 30,
+   'required_users': 15,
+   'msg_id': 'MICROWAVE'},
+  {'required_likes': 40,
+   'required_users': 20,
+   'msg_id': 'DJBIRB'},
+  {'required_likes': 45,
+   'required_users': 30,
+   'msg_id': 'PAPERTOWEL'},
+  {'required_likes': 46,
+   'required_users': 35,
+   'msg_id': 'RIDING'},
+  {'required_likes': 50,
+   'required_users': 40,
+   'msg_id': 'RIVERDANCE'},
 ]
