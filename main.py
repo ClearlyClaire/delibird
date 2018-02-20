@@ -259,7 +259,10 @@ class Delibird(StreamListener):
     """Handle the “go see” command requesting the bot to visit a given user"""
     text_with_user = match.group(2)
     if self.state == STATE_DELIVERY:
-      self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
+      if self.owner.id == status.account.id:
+        self.send_toot('ERROR_DELIVERY2', status, sender_acct=status.account.acct)
+      else:
+        self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
       return
     if self.state == STATE_OWNED and self.owner and self.owner.id != status.account.id:
       delta = self.last_owned + MAX_OWNED - datetime.datetime.now()

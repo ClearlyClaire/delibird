@@ -49,19 +49,31 @@ MSGS = {
   'ERROR_OWNED': {
     'text': '''@{sender_acct} Pwi pwi pwi!!!
 
-[FR] Je suis chez quelqu'un d'autre ! Je ne peux pas partir me promener pour l'instant !
+[FR] Je suis chez quelqu'un d'autre !
 Je serai de nouveau disponible si cette personne ne m'envoie pas me promener d'ici {hours}h{minutes:02d} !
+Tu peux me demander de te dire quand je serai disponible en me disant « notifie moi » !
 
-[EN] I'm currently visiting someone else! You can't send me around right now!
-I'll be available in {hours}h{minutes:02d} if that person doesn't send me around in the meantime!''',
+[EN] I'm currently visiting someone else!
+I'll be available in {hours}h{minutes:02d} if that person doesn't send me around in the meantime!
+You can request that I notify you when I'm available by telling me “notify me”!''',
     'privacy': 'direct',
    },
   'ERROR_DELIVERY': {
     'text': '''@{sender_acct} Pwiii pwii pwii pwiii!
 
 [FR] Je suis déjà en train de m'envoler pour voir quelqu'un d'autre !
+Tu peux me demander de te dire quand je serai disponible en me disant « notifie moi » !
 
-[EN] I'm already flying away to someone else!''',
+[EN] I'm already flying away to someone else!
+You can request that I notify you when I'm available by telling me “notify me”!''',
+    'privacy': 'direct',
+  },
+  'ERROR_DELIVERY2': {
+    'text': '''@{sender_acct} Pwiii pwii pwii pwiii!
+
+[FR] Tu m'as déjà envoyé voir quelqu'un d'autre ! Tu peux encore revenir sur ce choix en me disant « reviens » !
+
+[EN] You already sent me to someone else! If that was a mistake, you can tell me to “come back”!''',
     'privacy': 'direct',
   },
   'ERROR_INVALID_FORMAT': {
@@ -157,6 +169,22 @@ You can also tell me to “go play somewhere else”!''',
 
 [EN] The person I was sent to would like me to play somewhere else! Reply me with “go see user@domain”, and I'll fly to them!''',
     'privacy': 'public',
+  },
+  'NOTIFY_REQUEST': {
+    'text': '''@{acct} :caique: Pwii! :caique:
+
+[FR] Entendu ! Je te dirai la prochaine fois que je serai disponible !
+
+[EN] Got it! I'll tell you next time I'm available!''',
+    'privacy': 'direct',
+  },
+  'NOTIFY_IDLE': {
+    'text': '''@{acct} :caique: Pwii pwii! :caique:
+
+[FR] Tu m'avais demandé de te notifier quand je deviendrai disponible ! Et bien c'est chose faite !
+
+[EN] You requested that I notify you when I become available! I'm available now!''',
+    'privacy': 'direct',
   },
   'BELLY_RUB': {
     'text': ''':caique: Pwiiiiii <3 :caique:
