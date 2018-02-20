@@ -336,6 +336,7 @@ class Delibird(StreamListener):
     """Turn idle and announce it with a public toot"""
     self.state = STATE_IDLE
     self.last_idle_toot = self.send_toot('IDLE')
+    self.save()
 
 
   def handle_heartbeat(self):
