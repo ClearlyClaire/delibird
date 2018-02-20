@@ -6,7 +6,7 @@ import json
 import itertools
 from getpass import getpass
 from mastodon import Mastodon, StreamListener
-from mastodon.Mastodon import MastodonAPIError
+from mastodon.Mastodon import MastodonAPIError, MastodonNotFoundError
 from data import MEDIA, MSGS, REWARDS
 
 API_BASE = 'https://social.sitedethib.com'
