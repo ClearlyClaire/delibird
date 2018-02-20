@@ -134,11 +134,11 @@ If I'm not flying to the correct person, you can still tell me to “come back�
   'DELIVERED': {
     'text': '''@{receiver_acct} :caique: Pwiii pwii pwiii! :caique:
 
-[FR] Bonjour de la part de {sender_acct} ! Tu peux m'envoyer vers la personne de ton choix en me répondant « va voir utilisateur@domaine » ! En attendant, je ne suis qu'à toi pour les {nb_hours} prochaines heures !
-Si tu ne sais pas vers qui m'envoyer, tu peux me dire « va jouer ailleurs » !
+[FR] Bonjour de la part de {sender_acct} ! Envoie-moi voir qui tu veux en me répondant « va voir utilisateur@domaine » ! En attendant, je ne suis qu'à toi pour les {nb_hours} prochaines heures !
+Tu peux aussi me dire « va jouer ailleurs » !
 
-[EN] Hello from {sender_acct}! You can send me to anyone you'd like by replying me “go see user@domain”! Until you do, I'll be yours for the next {nb_hours} hours!
-If you don't know where to send me to, you can tell me to “go play somewhere else”!''',
+[EN] Hello from {sender_acct}! Send me to anyone by replying me “go see user@domain”! Until then, I'll be yours for the next {nb_hours} hours!
+You can also tell me to “go play somewhere else”!''',
     'privacy': 'direct',
     'media': ['FLYING_IN'],
   },
