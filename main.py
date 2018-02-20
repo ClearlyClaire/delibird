@@ -261,14 +261,20 @@ class Delibird(StreamListener):
     if self.state == STATE_DELIVERY:
       if self.owner.id == status.account.id:
         self.send_toot('ERROR_DELIVERY2', status, sender_acct=status.account.acct)
+      elif status.account.acct in self.to_be_notified:
+        self.send_toot('ERROR_DELIVERY3', status, sender_acct=status.account.acct)
       else:
         self.send_toot('ERROR_DELIVERY', status, sender_acct=status.account.acct)
       return
     if self.state == STATE_OWNED and self.owner and self.owner.id != status.account.id:
       delta = self.last_owned + MAX_OWNED - datetime.datetime.now()
       minutes = delta.seconds // 60
-      self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct,
-                     hours=(minutes // 60), minutes=(minutes % 60))
+      if status.account.acct in self.to_be_notified:
+        self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct,
+                       hours=(minutes // 60), minutes=(minutes % 60))
+      else:
+        self.send_toot('ERROR_OWNED2', status, sender_acct=status.account.acct,
+                       hours=(minutes // 60), minutes=(minutes % 60))
       return
 
     try:
