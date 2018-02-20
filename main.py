@@ -62,6 +62,8 @@ class Delibird(StreamListener):
     self.additional_idle_toots = []
     self.last_read_notification = None
     self.own_acct_id = None
+    self.last_request_id = None
+    self.visit_to_request_map = {}
     print('Delibird started!')
     self.load()
     self.resume()
@@ -84,7 +86,10 @@ class Delibird(StreamListener):
              'reward_level': self.reward_level,
              'state': self.state,
              'last_owned': self.last_owned.isoformat(),
-             'additional_idle_toots': self.additional_idle_toots}
+             'additional_idle_toots': self.additional_idle_toots,
+             'visit_to_request_map': self.visit_to_request_map}
+    if self.last_request_id is not None:
+      state['last_request_id'] = self.last_request_id
     if self.last_read_notification is not None:
       state['last_read_notification'] = self.last_read_notification
     if self.last_idle_toot is not None:
@@ -113,6 +118,8 @@ class Delibird(StreamListener):
       self.last_read_notification = state.get('last_read_notification', None)
       self.own_acct_id = state.get('own_acct_id', None)
       self.additional_idle_toots = state.get('additional_idle_toots', [])
+      self.visit_to_request_map = state.get('visit_to_request_map', {})
+      self.last_request_id = state.get('last_request_id', None)
       last_idle_toot = state.get('last_idle_toot', None)
       owner = state.get('owner', None)
       target = state.get('target', None)
@@ -302,6 +309,7 @@ class Delibird(StreamListener):
       return
 
     self.state = STATE_DELIVERY
+    self.last_request_id = status.id
     self.owner = status.account
     self.last_owned = datetime.datetime.now()
     self.target = target
@@ -363,10 +371,11 @@ class Delibird(StreamListener):
   def deliver(self):
     """Deliver a message to the target, updating ownership and state in the
     process"""
-    self.send_toot('DELIVERED',
-                   sender_acct=self.owner.acct,
-                   receiver_acct=self.target.acct,
-                   nb_hours=(MAX_OWNED.seconds // 3600))
+    status = self.send_toot('DELIVERED',
+                            sender_acct=self.owner.acct,
+                            receiver_acct=self.target.acct,
+                            nb_hours=(MAX_OWNED.seconds // 3600))
+    self.visit_to_request_map[status.id] = self.last_request_id
     self.owner = self.target
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
@@ -402,6 +411,11 @@ class Delibird(StreamListener):
       self.handle_mention(notification.status)
     if notification.type == 'favourite' and notification.status.visibility == 'direct':
       self.like_count += 1
+      if notification.status.id in self.visit_to_request_map:
+        try:
+          self.mastodon.status_favourite(self.visit_to_request_map[notification.status.id])
+        except MastodonAPIError:
+          pass
       self.save()
 
 
