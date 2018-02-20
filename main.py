@@ -371,7 +371,7 @@ class Delibird(StreamListener):
     self.last_owned = datetime.datetime.now()
     self.state = STATE_OWNED
     self.visited_users.add(self.owner.id)
-    self.to_be_notified.remove(self.owner.acct)
+    self.to_be_notified.discard(self.owner.acct)
     self.save()
 
 
