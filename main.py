@@ -414,6 +414,8 @@ class Delibird(StreamListener):
       if notification.status.id in self.visit_to_request_map:
         try:
           self.mastodon.status_favourite(self.visit_to_request_map[notification.status.id])
+        except MastodonNotFoundError:
+          del self.visit_to_request_map[notification.status.id]
         except MastodonAPIError:
           pass
       self.save()
