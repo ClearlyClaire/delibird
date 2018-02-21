@@ -277,10 +277,10 @@ class Delibird(StreamListener):
       delta = self.last_owned + MAX_OWNED - datetime.datetime.now()
       minutes = delta.seconds // 60
       if status.account.acct in self.to_be_notified:
-        self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct,
+        self.send_toot('ERROR_OWNED2', status, sender_acct=status.account.acct,
                        hours=(minutes // 60), minutes=(minutes % 60))
       else:
-        self.send_toot('ERROR_OWNED2', status, sender_acct=status.account.acct,
+        self.send_toot('ERROR_OWNED', status, sender_acct=status.account.acct,
                        hours=(minutes // 60), minutes=(minutes % 60))
       return
 
