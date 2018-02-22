@@ -50,6 +50,14 @@ MEDIA = {
 }
 
 MSGS = {
+  'ERROR_UNDELIVERABLE': {
+    'text': '''@{sender_acct} Pwiii…
+
+[FR] Désolé, je n'ai pas réussi à joindre {receiver_acct}… essaie avec quelqu'un d'autre ?
+
+[EN] Sorry, I can't reach {receiver_acct}… maybe try with someone else?''',
+    'privacy': 'direct',
+  },
   'ERROR_OWNED': {
     'text': '''@{sender_acct} Pwi pwi pwi!!!
 

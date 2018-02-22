@@ -375,13 +375,20 @@ class Delibird(StreamListener):
                             sender_acct=self.owner.acct,
                             receiver_acct=self.target.acct,
                             nb_hours=(MAX_OWNED.seconds // 3600))
-    self.visit_to_request_map[status.id] = self.last_request_id
-    self.owner = self.target
-    self.last_owned = datetime.datetime.now()
-    self.state = STATE_OWNED
-    self.visited_users.add(self.owner.id)
-    self.to_be_notified.discard(self.owner.acct)
-    self.save()
+    if status.mentions:
+      self.visit_to_request_map[status.id] = self.last_request_id
+      self.owner = self.target
+      self.last_owned = datetime.datetime.now()
+      self.state = STATE_OWNED
+      self.visited_users.add(self.owner.id)
+      self.to_be_notified.discard(self.owner.acct)
+      self.save()
+    else:
+      # Could not deliver, maybe OStatus-only?
+      self.state = STATE_OWNED
+      self.send_toot('ERROR_UNDELIVERABLE',
+                     sender_acct=self.owner.acct,
+                     receiver_acct=self.target.acct)
 
 
   def go_idle(self, msg_id='IDLE'):
