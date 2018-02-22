@@ -43,6 +43,10 @@ MEDIA = {
     'file': 'rewards/papertowel.mp4',
     'source': 'https://www.youtube.com/watch?v=6_-4KArFR08',
   },
+  'BIRDVSPHONE': {
+    'file': 'rewards/phonecover.mp4',
+    'source': 'https://www.youtube.com/watch?v=ktzfC5ZcOtE',
+  },
 }
 
 MSGS = {
@@ -293,6 +297,15 @@ I've met {nb_users} people so far and they liked me {nb_likes} times!''',
     'privacy': 'public',
     'media': ['RIVERDANCE'],
   },
+  'BIRBVSPHONE': {
+    'text': ''':caique: Pwii! :caique:
+
+[FR] Ne plaisante pas avec mon cousin, ok ? Ou sinon, gare à ton téléphone !
+
+[EN] Don't mess with my cousin ok? He'll wreak your phone! Or at least its cover!''',
+    'privacy': 'public',
+    'media': ['BIRDVSPHONE'],
+  },
 }
 
 REWARDS = [
@@ -323,4 +336,7 @@ REWARDS = [
   {'required_likes': 50,
    'required_users': 40,
    'msg_id': 'RIVERDANCE'},
+  {'required_likes': 60,
+   'required_users': 50,
+   'msg_id': 'BIRBVSPHONE'},
 ]
