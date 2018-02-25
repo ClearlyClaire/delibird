@@ -50,6 +50,14 @@ MEDIA = {
 }
 
 MSGS = {
+  'ERROR_NOBOT': {
+    'text': '''@{sender_acct} Pwii! Pwi.
+
+[FR] Désolé, je n'irai pas voir {receiver_acct}, car cette personne ne semble pas vouloir de la visite de bots.
+
+[EN] Sorry, I won't visit {receiver_acct} as they do not seem to like bots very much.''',
+    'privacy': 'direct',
+  },
   'ERROR_UNDELIVERABLE': {
     'text': '''@{sender_acct} Pwiii…
 
