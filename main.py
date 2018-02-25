@@ -310,7 +310,8 @@ class Delibird(StreamListener):
 
     if '#nobot' in target.note:
       self.send_toot('ERROR_NOBOT', status,
-                     sender_acct=status.account.acct)
+                     sender_acct=status.account.acct,
+                     receiver_acct=target.acct)
       return
 
     self.state = STATE_DELIVERY
