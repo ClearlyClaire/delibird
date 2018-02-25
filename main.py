@@ -211,11 +211,6 @@ class Delibird(StreamListener):
     match = LINK_RE.search(text_with_user)
     if match:
       url = match.group(1)
-      # First check if it's one of the mentioned users
-      for user in status.mentions:
-        if user.url == url:
-          return user
-      # If not, resolve it
       try:
         matches = self.mastodon.search(url, resolve=True).accounts
       except MastodonAPIError:
