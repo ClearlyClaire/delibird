@@ -372,10 +372,25 @@ class Delibird(StreamListener):
   def deliver(self):
     """Deliver a message to the target, updating ownership and state in the
     process"""
-    status = self.send_toot('DELIVERED',
-                            sender_acct=self.owner.acct,
-                            receiver_acct=self.target.acct,
-                            nb_hours=(MAX_OWNED.seconds // 3600))
+    try:
+      status = self.send_toot('DELIVERED',
+                              sender_acct=self.owner.acct,
+                              sender_acct_short=self.owner.acct,
+                              receiver_acct=self.target.acct,
+                              nb_hours=(MAX_OWNED.seconds // 3600))
+    except MastodonAPIError:
+      try:
+        status = self.send_toot('DELIVERED',
+                                sender_acct=self.owner.acct,
+                                sender_acct_short=self.owner.username,
+                                receiver_acct=self.target.acct,
+                                nb_hours=(MAX_OWNED.seconds // 3600))
+      except MastodonAPIError:
+          status = self.send_toot('DELIVERED',
+                                  sender_acct=self.owner.username,
+                                  sender_acct_short=self.owner.username,
+                                  receiver_acct=self.target.acct,
+                                  nb_hours=(MAX_OWNED.seconds // 3600))
     if status.mentions:
       self.visit_to_request_map[status.id] = self.last_request_id
       self.owner = self.target
