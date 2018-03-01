@@ -11,8 +11,8 @@ from data import MEDIA, MSGS, REWARDS
 
 API_BASE = 'https://social.sitedethib.com'
 
-COMMAND_RE = re.compile(r'(va voir|vole vers|va, vole vers|rends visite à|go see|go visit|fly to)\s*(.+)', re.IGNORECASE)
-FREE_RE = re.compile(r"(va (te promener|jouer))|rends-toi disponible|repose-toi|va-t'en|go idle|go away|((go|play) somewhere else)|take a break", re.IGNORECASE)
+COMMAND_RE = re.compile(r'(va[s]? voir|vole vers|va, vole vers|rends visite à|go see|go visit|fly to)\s*(.+)', re.IGNORECASE)
+FREE_RE = re.compile(r"(va[s]? (te promener|jouer))|rends-toi disponible|repose-toi|va-t'en|go idle|go away|((go|play) somewhere else)|take a break", re.IGNORECASE)
 CANCEL_RE = re.compile(r'reviens|arrête|annule|stop|come back|cancel', re.IGNORECASE)
 MENTION_RE = re.compile(r'([a-z0-9_]+)(@[a-z0-9\.\-]+[a-z0-9]+)?', re.IGNORECASE)
 NOTIFY_RE = re.compile(r'dis[ -]moi|notifie[ -]moi|rappelle[ -]moi|tell me|remind me|notify me', re.IGNORECASE)
