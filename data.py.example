@@ -7,6 +7,10 @@ MEDIA = {
     'file': 'hello.mp4',
     'source': 'https://www.youtube.com/watch?v=Gu8EudiPLZw',
   },
+  'STAIRS': {
+    'file': 'stairs.mp4',
+    'source': 'https://www.youtube.com/watch?v=coDxZZjTt4w',
+  },
   'BELLY_RUB': {
     'file': 'rewards/belly-rub.mp4',
     'source': 'https://www.youtube.com/watch?v=-bTaj37E79k',
@@ -46,6 +50,14 @@ MEDIA = {
   'BIRDVSPHONE': {
     'file': 'rewards/phonecover.mp4',
     'source': 'https://www.youtube.com/watch?v=ktzfC5ZcOtE',
+  },
+  'KILLERBIRD': {
+    'file': 'rewards/killerbird.mp4',
+    'source': 'https://twitter.com/colloritz/status/798470429308424192',
+  },
+  'WITHFRIENDS': {
+    'file': 'rewards/friends.mp4',
+    'source': 'https://twitter.com/s_hatachan/status/879946102878883840',
   },
 }
 
@@ -194,7 +206,7 @@ Tu peux aussi me dire « va jouer ailleurs » !
 [EN] Hello from {sender_acct_short}! Send me to anyone by replying “go see user@domain”! Until then, I'll be yours for the next {nb_hours} hours!
 You can also tell me to “go play somewhere else”!''',
     'privacy': 'direct',
-    'media': ['FLYING_IN'],
+    'media': {('FLYING_IN',): 3, ('STAIRS',): 1},
   },
   'IDLE': {
     'text': ''':caique: Pwiii… pwii pwii! :caique:
@@ -322,6 +334,24 @@ I've met {nb_users} people so far and they liked me {nb_likes} times!''',
     'privacy': 'public',
     'media': ['BIRDVSPHONE'],
   },
+  'KILLERBIRD': {
+    'text': ''':caique: … :caique:
+
+[FR] Mon cousin me fait peur parfois… j'espère qu'il ne fera jamais rien de tel à aucune des {nb_users} personnes que j'ai rencontré !
+
+[EN] I'm afraid of my cousin sometimes… I hope he won't do anything like this to any of the {nb_users} people I've met so far!''',
+    'privacy': 'public',
+    'media': ['KILLERBIRD'],
+  },
+  'WITHFRIENDS': {
+    'text': ''':caique: Pwiii pwii pwii~ :caique:
+
+[FR] En train de passer du temps avec mes amis ! Je leur raconte mes rencontres avec vous tous et les {nb_likes} fois où vous avez apprécié mes visites !
+
+[EN] Hanging out with my friends, telling them about all {nb_users} of you and how you liked my visits {nb_likes} times!''',
+    'privacy': 'public',
+    'media': ['WITHFRIENDS'],
+  }
 }
 
 REWARDS = [
@@ -355,4 +385,10 @@ REWARDS = [
   {'required_likes': 60,
    'required_users': 50,
    'msg_id': 'BIRBVSPHONE'},
+  {'required_likes': 70,
+   'required_users': 60,
+   'msg_id': 'KILLERBIRD'},
+  {'required_likes': 80,
+   'required_users': 70,
+   'msg_id': 'WITHFRIENDS'},
 ]
